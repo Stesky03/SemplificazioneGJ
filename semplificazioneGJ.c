@@ -7,9 +7,13 @@ struct s_pair{
 };
 typedef struct s_pair pair;
 
+void semplificazione(int *a, int *b);
+
 int contaZeri(pair* v, int length);
 
-int compareRows(){};
+void insSort(int* zeri, pair** A, int aSize);
+
+void riduzioneMat(pair** A, int *zeri, int m, int n);
 
 int main(){
     FILE *inputFile = fopen("input.txt", "r");
@@ -58,17 +62,15 @@ int main(){
             }
         }
     }
-    for(int i=0;i<m;i++){
-        for(int j=0;j<n;j++){
-            for(int t=2;t<=A[i][j].den && t<=A[i][j].num;t++){
-                if(A[i][j].den%t==0 && A[i][j].num%t==0){
-                    A[i][j].den/=t;
-                    A[i][j].num/=t;
-                    t=1;
-                }
-            }
-        }
-    }
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            semplificazione(&A[i][j].num, &A[i][j].den);
+
+    for(int i=0;i<m;i++)
+        nZeri[i]=contaZeri(A[i], n);
+
+    insSort(nZeri, A, m);
+    
     if(flag){
         for(int i=0;i<m;i++){
                 for(int j=0;j<n;j++){
@@ -87,21 +89,69 @@ int main(){
             printf("\n");
         }
     }
+    //riduzioneMat(A, nZeri, m, n);
 
-    for(int i=0;i<m;i++)
-        nZeri[i]=contaZeri(A[i], n);
-
-    qsort(A, m, sizeof(pair), compareRows);
-    
 
     return 0;
+}
 
+void semplificazione(int *a, int *b){
+    for(int t=2;t<=*a && t<=*b;t++)
+        if(*a%t==0 && *b%t==0){
+            *a/=t;
+            *b/=t;
+            t=1;
+        }
 }
 
 int contaZeri(pair* v, int length){
     int x=0;
-    for(int i=0;i<length;i++)
-        if(v[i].num==0)
-            x++;
+    for(int i=0;v[i].num==0;i++)
+        x=i+1;
     return x;
 };
+
+void insSort(int* zeri, pair** A, int aSize){
+    int t1, minNum;
+    pair* t2;
+    for(int i=0;i<aSize;i++){
+        minNum=aSize;
+        for(int j=i;j<aSize;j++){
+            if(zeri[minNum]>zeri[j]){
+                minNum=j;
+            }
+        }
+        t1=zeri[minNum];
+        zeri[minNum]=zeri[i];
+        zeri[i]=t1;
+        t2=A[minNum];
+        A[minNum]=A[i];
+        A[i]=t2;
+    }
+}
+
+void riduzioneMat(pair** A, int *zeri, int m, int n){//la posizione del primo zero equivale a n_zeri-1
+    int x,y;
+    x=y=0;
+    while(x<n && y<m){
+        if(A[y][x].num==0){
+            x++;
+            continue;
+        }
+        if(A[y][x].num!=A[y][x].den){
+            for(int j=0;j<n;j++){
+                A[y][j].num*=A[y][x].den;
+                A[y][j].den*=A[y][x].num;
+                semplificazione(&A[y][j].den, &A[y][j].num);
+            }
+        }
+        if(A[y][x].num==1){
+            for(int i=y+1;i<m;i++){
+                if(A[i][x].num>0)
+                    for(int j=x;j<n;j++){
+                        
+                    }
+            }
+        }
+    }
+}
